@@ -7,13 +7,18 @@ generation = 0
 width = 60
 height = 30
 
-grid1 = [0...width+1].map (x) ->
-  [0...height].map (y) ->
-    Math.random() >= 0.5
-
-grid2 = [0...width+1].map (x) ->
-  [0...height].map (y) ->
+grid1 = [0..width].map (x) ->
+  [0..height].map (y) ->
     false
+
+grid2 = [0..width].map (x) ->
+  [0..height].map (y) ->
+    false
+
+seed = ->
+  for y in [1..height-1]
+    for x in [1..width-1]
+      grid1[x][y] = Math.random() >= 0.5
 
 print_grid = (grid) ->
   buffer = '''\033[42m''' #ANSI code for green color
@@ -30,8 +35,8 @@ print_grid = (grid) ->
   console.log buffer
   console.log '''\033[0m'''
 
-console.log 'kittens'
 generate = (source, target) ->
+  generation += 1
   console.log 'generating'
   for y in [1..height-1]
     for x in [1..width-1]
@@ -40,7 +45,7 @@ generate = (source, target) ->
       live_neighbors += 1 if source[x][y-1] is true
       live_neighbors += 1 if source[x+1][y-1] is true
       live_neighbors += 1 if source[x-1][y] is true
-      live_neighbors += 1 if source[x+1][y1] is true
+      live_neighbors += 1 if source[x+1][y] is true
       live_neighbors += 1 if source[x-1][y+1] is true
       live_neighbors += 1 if source[x][y+1] is true
       live_neighbors += 1 if source[x+1][y+1] is true
@@ -49,7 +54,6 @@ generate = (source, target) ->
         target[x][y] = true if (live_neighbors is 2 || live_neighbors is 3)
       else
         target[x][y] = true if live_neighbors is 3
-  generation += 1
 
 sleep = (ms) ->
   start = new Date().getTime()
@@ -57,28 +61,15 @@ sleep = (ms) ->
 
 iterate = ->
   if generation % 2 is 0
-    console.log 'def'
     generate(grid1, grid2)
-    console.log 'ghi'
     print_grid(grid2)
-    console.log 'jk'
   else
-    console.log 'lm'
     generate(grid2, grid1)
-    console.log 'no'
     print_grid(grid1)
-    console.log 'pe'
 
-print_grid (grid1)
-
-counter = 0
+print_grid(grid1)
+seed()
 
 while (1 is 1)
-  counter += 1
-  console.log 'this printed'
-  console.log counter
   iterate()
-  console.log counter
-  sleep 400
-  console.log counter
-  console.log 'this too'
+  sleep(400)
